@@ -3,7 +3,8 @@ import * as Yup from 'yup';
 class Validation {
   async validateSchema(type, body) {
     switch (type) {
-      case 'store' || 'update':
+      case 'store':
+      case 'update':
         // eslint-disable-next-line no-case-declarations
         const schema = Yup.object().shape({
           name: Yup.string().required(),
@@ -19,7 +20,6 @@ class Validation {
           return false;
         }
         return true;
-
       default:
         return false;
     }
