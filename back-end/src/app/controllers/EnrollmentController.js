@@ -4,6 +4,7 @@ import Enrollment from '../models/Enrollment';
 import Student from '../models/student';
 import Plan from '../models/Plan';
 
+import checkDate from '../../helpers/isBeforeDate';
 import validations from '../../validations/enrollment';
 
 class EnrollmentController {
@@ -65,6 +66,13 @@ class EnrollmentController {
           .status(400)
           .json({ success: false, error: 'Plan not found.' });
 
+      const dateIsBefore = checkDate(start_date);
+
+      if (dateIsBefore)
+        return res
+          .status(400)
+          .json({ success: false, error: 'Past dates are not permitted' });
+
       const end_date = moment(start_date).add(checkPlan.duration, 'M');
       const price = checkPlan.price * checkPlan.duration;
 
@@ -99,33 +107,56 @@ class EnrollmentController {
       if (!schema)
         return res
           .status(400)
-          .json({ success: false, error: 'Validation failed.' });
+          .json({ success: false, error: 'Validation failed' });
 
-      const plan = await Plan.findByPk(req.params.id);
+      const enrollment = await Enrollment.findByPk(req.params.id);
 
-      if (!plan)
+      if (!enrollment)
+        return res
+          .status(400)
+          .json({ success: false, error: 'Enrollment not found.' });
+
+      const { student_id, plan_id, start_date } = req.body;
+
+      const checkStudent = await Student.findOne({ where: { id: student_id } });
+
+      if (!checkStudent)
+        return res
+          .status(400)
+          .json({ success: false, error: 'Student not found.' });
+
+      const checkPlan = await Plan.findOne({ where: { id: plan_id } });
+
+      if (!checkPlan)
         return res
           .status(400)
           .json({ success: false, error: 'Plan not found.' });
 
-      if (req.body.title !== plan.title) {
-        const planExists = await Plan.findOne({
-          where: { title: req.body.title },
-        });
+      const dateIsBefore = checkDate(start_date);
 
-        if (planExists)
-          return res
-            .status(400)
-            .json({ success: false, error: 'Plan already exists.' });
-      }
+      if (dateIsBefore)
+        return res
+          .status(400)
+          .json({ success: false, error: 'Past dates are not permitted' });
 
-      const { id, title, duration, price } = await plan.update(req.body);
+      const end_date = moment(start_date).add(checkPlan.duration, 'M');
+      const price = checkPlan.price * checkPlan.duration;
+
+      const { id } = await enrollment.update({
+        student_id,
+        plan_id,
+        start_date,
+        end_date,
+        price,
+      });
 
       return res.json({
-        plan: {
+        student: {
           id,
-          title,
-          duration,
+          student_id,
+          plan_id,
+          start_date: moment(start_date),
+          end_date,
           price,
         },
         success: true,
@@ -137,18 +168,18 @@ class EnrollmentController {
 
   async delete(req, res) {
     try {
-      const plan = await Plan.findByPk(req.params.id);
+      const enrollment = await Enrollment.findByPk(req.params.id);
 
-      if (!plan)
+      if (!enrollment)
         return res
           .status(400)
-          .json({ success: false, error: 'Plan not found.' });
+          .json({ success: false, error: 'Enrollment not found.' });
 
-      plan.deleted_at = new Date();
+      enrollment.deleted_at = new Date();
 
-      await plan.save();
+      await enrollment.save();
 
-      return res.json({ plan, success: true });
+      return res.json({ enrollment, success: true });
     } catch (error) {
       return res.status(400).json(error);
     }
