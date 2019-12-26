@@ -1,22 +1,38 @@
+import moment from 'moment';
+
+import Enrollment from '../models/Enrollment';
+import Student from '../models/student';
 import Plan from '../models/Plan';
 
-import validations from '../../validations/plans';
+import validations from '../../validations/enrollment';
 
-class PlanController {
+class EnrollmentController {
   async index(req, res) {
     try {
       const { page = 1 } = req.query;
 
-      const plans = await Plan.findAll({
+      const enrollment = await Enrollment.findAll({
         where: { deleted_at: null },
         order: [['created_at', 'DESC']],
-        attributes: ['id', 'title', 'duration', 'price'],
+        attributes: ['id', 'start_date', 'end_date', 'price'],
         limit: 10,
         offset: (page - 1) * 10,
+        include: [
+          {
+            model: Student,
+            as: 'student',
+            attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
+          },
+          {
+            model: Plan,
+            as: 'plan',
+            attributes: ['id', 'title', 'duration', 'price'],
+          },
+        ],
       });
 
       return res.json({
-        plans,
+        enrollment,
         success: true,
       });
     } catch (error) {
@@ -33,22 +49,40 @@ class PlanController {
           .status(400)
           .json({ success: false, error: 'Validation failed' });
 
-      const planExists = await Plan.findOne({
-        where: { title: req.body.title },
-      });
+      const { student_id, plan_id, start_date } = req.body;
 
-      if (planExists)
+      const checkStudent = await Student.findOne({ where: { id: student_id } });
+
+      if (!checkStudent)
         return res
           .status(400)
-          .json({ success: false, error: 'Plan already exists.' });
+          .json({ success: false, error: 'Student not found.' });
 
-      const { id, title, duration, price } = await Plan.create(req.body);
+      const checkPlan = await Plan.findOne({ where: { id: plan_id } });
+
+      if (!checkPlan)
+        return res
+          .status(400)
+          .json({ success: false, error: 'Plan not found.' });
+
+      const end_date = moment(start_date).add(checkPlan.duration, 'M');
+      const price = checkPlan.price * checkPlan.duration;
+
+      const { id } = await Enrollment.create({
+        student_id,
+        plan_id,
+        start_date,
+        end_date,
+        price,
+      });
 
       return res.json({
         student: {
           id,
-          title,
-          duration,
+          student_id,
+          plan_id,
+          start_date: moment(start_date),
+          end_date,
           price,
         },
         success: true,
@@ -121,4 +155,4 @@ class PlanController {
   }
 }
 
-export default new PlanController();
+export default new EnrollmentController();
