@@ -1,4 +1,4 @@
-import Student from '../models/student';
+import Student from '../models/Student';
 
 import validations from '../../validations/students';
 

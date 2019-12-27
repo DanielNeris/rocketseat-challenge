@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import Enrollment from '../models/Enrollment';
-import Student from '../models/student';
+import Student from '../models/Student';
 import Plan from '../models/Plan';
 
 import checkDate from '../../helpers/isBeforeDate';
