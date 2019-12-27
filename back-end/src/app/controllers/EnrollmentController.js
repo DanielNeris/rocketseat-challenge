@@ -3,7 +3,9 @@ import moment from 'moment';
 import Enrollment from '../models/Enrollment';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
+import Queue from '../../lib/Queue';
 
+import RegisteredMail from '../jobs/RegisteredMail';
 import checkDate from '../../helpers/isBeforeDate';
 import validations from '../../validations/enrollment';
 
@@ -82,6 +84,14 @@ class EnrollmentController {
         start_date,
         end_date,
         price,
+      });
+
+      await Queue.add(RegisteredMail.key, {
+        checkStudent,
+        checkPlan,
+        price,
+        start_date,
+        end_date,
       });
 
       return res.json({

@@ -6,7 +6,7 @@ module.exports = {
         {
           title: 'Start',
           duration: 1,
-          price: 150000,
+          price: 15000,
           created_at: new Date(),
           updated_at: new Date(),
           deleted_at: null,
@@ -14,7 +14,7 @@ module.exports = {
         {
           title: 'Gold',
           duration: 3,
-          price: 120000,
+          price: 12000,
           created_at: new Date(),
           updated_at: new Date(),
           deleted_at: null,
@@ -22,7 +22,7 @@ module.exports = {
         {
           title: 'Diamond',
           duration: 6,
-          price: 90000,
+          price: 9000,
           created_at: new Date(),
           updated_at: new Date(),
           deleted_at: null,
