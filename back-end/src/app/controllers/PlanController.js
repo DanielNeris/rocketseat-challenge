@@ -1,6 +1,6 @@
 import Plan from '../models/Plan';
 
-import validations from '../../validations/plans';
+import validations from '../../validator/plans';
 
 class PlanController {
   async index(req, res) {
@@ -26,7 +26,7 @@ class PlanController {
 
   async store(req, res) {
     try {
-      const schema = await validations.validateSchema('store', req.body);
+      const schema = await validations.validateSchema('STORE', req.body);
 
       if (!schema)
         return res
@@ -60,7 +60,7 @@ class PlanController {
 
   async update(req, res) {
     try {
-      const schema = await validations.validateSchema('update', req.body);
+      const schema = await validations.validateSchema('UPDATE', req.body);
 
       if (!schema)
         return res

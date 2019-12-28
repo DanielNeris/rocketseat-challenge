@@ -7,7 +7,7 @@ import Queue from '../../lib/Queue';
 
 import RegisteredMail from '../jobs/RegisteredMail';
 import checkDate from '../../helpers/isBeforeDate';
-import validations from '../../validations/enrollment';
+import validations from '../../validator/enrollments';
 
 class EnrollmentController {
   async index(req, res) {
@@ -45,7 +45,7 @@ class EnrollmentController {
 
   async store(req, res) {
     try {
-      const schema = await validations.validateSchema('store', req.body);
+      const schema = await validations.validateSchema('STORE', req.body);
 
       if (!schema)
         return res
@@ -112,7 +112,7 @@ class EnrollmentController {
 
   async update(req, res) {
     try {
-      const schema = await validations.validateSchema('update', req.body);
+      const schema = await validations.validateSchema('UPDATE', req.body);
 
       if (!schema)
         return res

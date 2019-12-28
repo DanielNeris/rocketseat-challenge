@@ -1,11 +1,11 @@
 import Student from '../models/Student';
 
-import validations from '../../validations/students';
+import validations from '../../validator/students';
 
 class StudentController {
   async store(req, res) {
     try {
-      const schema = await validations.validateSchema('store', req.body);
+      const schema = await validations.validateSchema('STORE', req.body);
 
       if (!schema)
         return res
@@ -43,7 +43,7 @@ class StudentController {
 
   async update(req, res) {
     try {
-      const schema = await validations.validateSchema('update', req.body);
+      const schema = await validations.validateSchema('UPDATE', req.body);
 
       if (!schema)
         return res

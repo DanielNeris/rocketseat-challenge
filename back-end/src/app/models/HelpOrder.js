@@ -1,15 +1,18 @@
 import Sequelize, { Model } from 'sequelize';
 
-class Checkin extends Model {
+class HelpOrder extends Model {
   static init(sequelize) {
     super.init(
       {
-        date: Sequelize.VIRTUAL,
+        question: Sequelize.STRING,
+        answer: Sequelize.STRING,
+        answer_at: Sequelize.DATE,
       },
       {
         sequelize,
       }
     );
+
     return this;
   }
 
@@ -17,4 +20,5 @@ class Checkin extends Model {
     this.belongsTo(models.Student, { foreignKey: 'student_id', as: 'student' });
   }
 }
-export default Checkin;
+
+export default HelpOrder;

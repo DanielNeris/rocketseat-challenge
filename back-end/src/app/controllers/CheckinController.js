@@ -3,7 +3,7 @@ import moment from 'moment';
 import Checkin from '../models/Checkin';
 import Student from '../models/Student';
 
-import validations from '../../validations/Checkin';
+import validations from '../../validator/checkins';
 
 class StudentController {
   async index(req, res) {
@@ -16,7 +16,7 @@ class StudentController {
       const checkins = await Checkin.findAll({
         where: { student_id },
         order: [['created_at', 'DESC']],
-        attributes: ['id'],
+        attributes: ['id', 'created_at'],
         limit: 10,
         offset: (page - 1) * 10,
         include: [
@@ -30,8 +30,6 @@ class StudentController {
 
       return res.json({ checkins, success: true });
     } catch (error) {
-      console.log(error);
-
       return res.status(400).json(error);
     }
   }
@@ -39,7 +37,7 @@ class StudentController {
   async store(req, res) {
     try {
       const { student_id } = req.params;
-      const schema = await validations.validateSchema('store', {
+      const schema = await validations.validateSchema('STORE', {
         student_id,
       });
 
